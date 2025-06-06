@@ -1,5 +1,6 @@
 from rest_framework import viewsets, generics, permissions, parsers, status
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from django.shortcuts import get_object_or_404
 
 from . import serializers
 from .models import User, MemberProfile, Package, MemberPackage, Schedule, Review, Progress, Payment, Notification, Chat, Message
@@ -30,31 +31,43 @@ class UserViewSet(viewsets.ViewSet, generics.CreateAPIView):
         else:
             return Response(serializers.UserSerializer(request.user).data)
 
-class MemberProfileViewSet(viewsets.ViewSet, generics.CreateAPIView):
+    @action(methods=['get'], url_path="personal-trainers", detail=False,
+            permission_classes=[permissions.IsAuthenticated])
+    def list_personal_trainers(self, request):
+        """Lấy danh sách Personal Trainers"""
+        trainers = User.objects.filter(role='pt', is_active=True)
+
+        trainer_data = []
+        for trainer in trainers:
+            trainer_data.append({
+                'id': trainer.id,
+                'first_name': trainer.first_name,
+                'last_name': trainer.last_name,
+                'email': trainer.email,
+                'phone': getattr(trainer, 'phone', ''),
+                'specialization': getattr(trainer, 'specialization', ''),
+                'role': trainer.role
+            })
+
+        return Response(trainer_data)
+#class MemberProfileViewSet(viewsets.ViewSet, generics.CreateAPIView):
+#   queryset = MemberProfile.objects.all()
+#   serializer_class = MemberProfileSerializer
+class MemberProfileViewSet(viewsets.ModelViewSet):
     queryset = MemberProfile.objects.all()
     serializer_class = MemberProfileSerializer
-
-
-    # @action(methods=['post'], detail=True, url_path='member-profiles')
-    # def get_comments(self, request, pk):
-    #     if request.method.__eq__('POST'):
-    #         s = serializers.MemberProfileSerializer(data={
-    #             'height': request.data.get('height'),
-    #             'weight': request.data.get('weight'),
-    #             'goal': request.data.get('goal'),
-    #             'user_id': request.data.get('user_id')
-    #         })
-    #         s.is_valid(raise_exception=True)
-    #         c = s.save()
-    #         return Response(serializers.MemberProfileSerializer(c).data, status=status.HTTP_201_CREATED)
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        # Chỉ admin hoặc chính user mới thấy profile
         if self.request.user.is_superuser:
             return MemberProfile.objects.all()
         return MemberProfile.objects.filter(user=self.request.user)
 
-
+    @action(detail=False, methods=['get'], url_path='me')
+    def my_profile(self, request):
+        profile = get_object_or_404(MemberProfile, user=request.user)
+        serializer = self.get_serializer(profile)
+        return Response(serializer.data)
 class PackageViewSet(viewsets.ModelViewSet):
     queryset = Package.objects.all()
     serializer_class = PackageSerializer

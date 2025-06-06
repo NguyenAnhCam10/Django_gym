@@ -19,7 +19,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id', 'username', 'email', 'first_name', 'last_name', 'phone', 'role', 'created_at', 'last_login')
+        fields = ('id', 'username', 'email', 'password' ,'first_name', 'last_name', 'phone', 'role', 'created_at', 'last_login')
         extra_kwargs = {
             'password': {
                 'write_only': True
@@ -71,6 +71,7 @@ class ScheduleSerializer(serializers.ModelSerializer):
     pt_id = serializers.PrimaryKeyRelatedField(
         queryset=User.objects.filter(role='pt'),
         source='pt',
+        required=False,
         write_only=True,
         allow_null=True
     )

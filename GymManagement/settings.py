@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-3i11t&#pa2^ueeuixseryeb2tw@^e2xsmesig!ter(e0_659jk
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*', "10.0.2.2"]
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -92,7 +92,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'gymdb',
         'USER': 'root',
-        'PASSWORD': 'Admin@123',
+        'PASSWORD': '123456789',
         'HOST': ''  # mặc định localhost
     }
 }
