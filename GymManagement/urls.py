@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.urls import path, include
-
+from GymApp.admin import admin_site
 # Swagger
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
@@ -19,7 +19,7 @@ schema_view = get_schema_view(
 )
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('admin/', admin_site.urls),
     path('', include('GymApp.urls')),
     path('o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
